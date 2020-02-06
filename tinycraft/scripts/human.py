@@ -4,6 +4,7 @@ Build and run the human interface executable with the requested environment
 
 import argparse
 import os
+import platform
 import sys
 import subprocess as sp
 
