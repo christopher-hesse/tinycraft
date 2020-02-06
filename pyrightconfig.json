@@ -1,0 +1,10 @@
+{
+    "include": [
+        "tinycraft"
+    ],
+    "typeshedPath": "third-party/typeshed",
+    "reportUnusedVariable": true,
+    "reportUnusedFunction": true,
+    "reportUnusedImport": true,
+    "reportUnusedClass": true
+}
