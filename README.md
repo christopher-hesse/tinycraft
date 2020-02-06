@@ -68,16 +68,16 @@ pip install -e tinycraft
 
 ## Try it out
 
+Use the program with a human-centric interface:
+
+```sh
+python -m tinycraft.scripts.human
+```
+
 Use the environment from the perspective of an agent:
 
 ```sh
 python -m tinycraft.scripts.interactive
-```
-
-Use the program with a more human-centric interface:
-
-```sh
-python -m tinycraft.scripts.human
 ```
 
 ## Benchmark
