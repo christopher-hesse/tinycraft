@@ -24,7 +24,19 @@ Missing things:
 
 ## Installation
 
-On Ubuntu 18.04:
+### Mac
+
+```sh
+curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+sh Miniconda3-latest-MacOSX-x86_64.sh -b
+~/miniconda3/bin/conda init
+exec -l $SHELL
+conda env update --name tinycraft --file tinycraft/env.yaml
+conda activate tinycraft
+pip install -e tinycraft
+```
+
+### Ubuntu 18.04 on GCP
 
 ```sh
 gcloud compute instances create instance-1 --machine-type=n1-standard-8 --accelerator=type=nvidia-tesla-v100,count=1 --image=ubuntu-1804-bionic-v20200129a --image-project=ubuntu-os-cloud --boot-disk-size=50GB
@@ -54,12 +66,18 @@ conda activate tinycraft
 pip install -e tinycraft
 ```
 
-## Interactive
+## Try it out
 
 Use the environment from the perspective of an agent:
 
 ```sh
 python -m tinycraft.scripts.interactive
+```
+
+Use the program with a more human-centric interface:
+
+```sh
+python -m tinycraft.scripts.human
 ```
 
 ## Benchmark
