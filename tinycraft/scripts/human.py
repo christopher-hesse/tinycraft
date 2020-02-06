@@ -24,7 +24,10 @@ def main():
         print("failed to build")
         sys.exit(1)
     config_env()
-    sp.run(os.path.join(output_dir, f"{name}.exe"))
+    suffix = ""
+    if platform.system() == "Windows":
+        suffix = ".exe"
+    sp.run(os.path.join(output_dir, f"{name}{suffix}"))
 
 
 if __name__ == "__main__":
