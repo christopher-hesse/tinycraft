@@ -2,6 +2,8 @@
 
 An simple 3D reinforcement learning environment inspired by [Minecraft](https://www.youtube.com/watch?v=ToEFJC1xjU8) and [MineRL](http://minerl.io/).
 
+![video](support/video.gif)
+
 Features:
 
 * voxels
@@ -122,3 +124,9 @@ From the data above it looks like the GPU is faster, but for 8 envs, it's not a 
 With pre-emptible instances, the GPU machine costs $0.80 per hour, while the vCPU cores are $0.0075 per vCPU per hour, for an equivalent machine with ~110 vCPUs.  For pre-emptible instances, the hardware rendering mode would need to be 14x faster than the software one.
 
 Keep in mind that while this environment is simple, it's not extensively tuned for performance and hard to draw conclusions about any other 3D environments.
+
+## Resources
+
+* [Kenney Voxel Pack](https://www.kenney.nl/assets/voxel-pack)
+* [Ambient occlusion for Minecraft-like worlds](https://0fps.net/2013/07/03/ambient-occlusion-for-minecraft-like-worlds/)
+* [stb_voxel_render.h](https://www.youtube.com/watch?v=2vnTtiLrV1w)
