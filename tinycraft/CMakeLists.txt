@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(voxel VERSION 1.0.1 DESCRIPTION "voxel environment")
+project(tinycraft VERSION 1.0.1 DESCRIPTION "tinycraft environment")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
