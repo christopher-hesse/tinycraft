@@ -8,6 +8,7 @@ Features:
 
 * voxels
 * light
+* smooth light
 * reasonably fast
 * not a crazy amount of code (3.5k lines of C++ excluding data files, of which about half is the environment itself)
 * python interface
