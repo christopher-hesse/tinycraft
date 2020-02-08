@@ -24,6 +24,18 @@ Missing things:
 
 ## Installation
 
+### Windows
+
+```sh
+# first install chocolatey https://chocolatey.org/docs/installation
+# then open an administrator cmd.exe
+choco install miniconda3
+git clone https://github.com/cshesse/tinycraft.git
+conda env update --name tinycraft --file tinycraft/env.yaml
+conda activate tinycraft
+pip install -e tinycraft
+```
+
 ### Mac
 
 ```sh
@@ -31,6 +43,7 @@ curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
 sh Miniconda3-latest-MacOSX-x86_64.sh -b
 ~/miniconda3/bin/conda init
 exec -l $SHELL
+git clone https://github.com/cshesse/tinycraft.git
 conda env update --name tinycraft --file tinycraft/env.yaml
 conda activate tinycraft
 pip install -e tinycraft
@@ -61,6 +74,7 @@ curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sh Miniconda3-latest-Linux-x86_64.sh -b
 ~/miniconda3/bin/conda init
 exec -l $SHELL
+git clone https://github.com/cshesse/tinycraft.git
 conda env update --name tinycraft --file tinycraft/env.yaml
 conda activate tinycraft
 pip install -e tinycraft
