@@ -16,7 +16,6 @@ Features:
 
 Missing things:
 
-* the environment doesn't actually have a reward defined yet
 * dynamic generation of land chunks (they're all generated at the start of the episode)
 * physics system that works reasonably well
 * any actual gameplay (items, etc)
