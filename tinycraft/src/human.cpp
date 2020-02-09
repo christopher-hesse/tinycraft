@@ -7,65 +7,67 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     }
 }
 
-typedef i32 (*get_act_fn)(GLFWwindow *window);
+typedef Action (*get_act_fn)(GLFWwindow *, f64, f64);
 
-i32 get_act_cube(GLFWwindow *window) {
-    i32 act = 0;
+Action get_act_cube(GLFWwindow *window, f64 delta_xpos, f64 delta_ypos) {
+    Action act = {};
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        act |= KEY_UP;
+        act.keys |= KEY_UP;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        act |= KEY_DOWN;
+        act.keys |= KEY_DOWN;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        act |= KEY_LEFT;
+        act.keys |= KEY_LEFT;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        act |= KEY_RIGHT;
+        act.keys |= KEY_RIGHT;
     }
     return act;
 }
 
-i32 get_act_world(GLFWwindow *window) {
-    i32 act = 0;
+Action get_act_world(GLFWwindow *window, f64 delta_xpos, f64 delta_ypos) {
+    Action act = {};
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        act |= KEY_MOVE_FORWARD;
+        act.keys |= KEY_MOVE_FORWARD;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        act |= KEY_MOVE_BACK;
+        act.keys |= KEY_MOVE_BACK;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        act |= KEY_MOVE_LEFT;
+        act.keys |= KEY_MOVE_LEFT;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        act |= KEY_MOVE_RIGHT;
+        act.keys |= KEY_MOVE_RIGHT;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        act |= KEY_MOVE_DOWN;
+        act.keys |= KEY_MOVE_DOWN;
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        act |= KEY_MOVE_UP;
+        act.keys |= KEY_MOVE_UP;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        act |= KEY_TURN_LEFT;
+        act.delta_yaw += 0.5f;
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        act |= KEY_TURN_RIGHT;
+        act.delta_yaw -= 0.5f;
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        act |= KEY_TURN_UP;
+        act.delta_pitch += 0.5f;
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        act |= KEY_TURN_DOWN;
+        act.delta_pitch -= 0.5f;
     }
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
-        act |= KEY_ATTACK;
+    act.delta_yaw -= f32(delta_xpos / 1000.0);
+    act.delta_pitch -= f32(delta_ypos / 1000.0);
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS|| glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)  {
+        act.keys |= KEY_ATTACK;
     }
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
-        act |= KEY_USE;
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS|| glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        act.keys |= KEY_USE;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        act |= KEY_SPRINT;
+        act.keys |= KEY_SPRINT;
     }
     return act;
 }
@@ -93,6 +95,10 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     glfwSetKeyCallback(window, key_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (glfwRawMouseMotionSupported()) {
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    }
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(1);
@@ -109,11 +115,19 @@ int main(int argc, char *argv[]) {
     }
     g->init(false);
     g->reset();
-    f32 rew;
-    u8 done;
+    f32 rew = 0.0f;
+    u8 done = false;
+    f64 prev_xpos = 0.0;
+    f64 prev_ypos = 0.0;
+        glfwGetCursorPos(window, &prev_xpos, &prev_ypos);
 
     while (!glfwWindowShouldClose(window)) {
-        g->act(get_act(window), &rew, &done);
+        f64 xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        auto act = get_act(window, xpos-prev_xpos, ypos-prev_ypos);
+        prev_xpos = xpos;
+        prev_ypos = ypos;
+        g->act(act, &rew, &done);
         g->draw();
         glfwSwapBuffers(window);
         glfwPollEvents();

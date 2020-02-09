@@ -254,7 +254,11 @@ def worker(remote, parent_remote, env_fn_wrappers):
         while True:
             cmd, data = remote.recv()
             if cmd == "step":
-                remote.send([step_env(env, action) for env, action in zip(envs, data)])
+                actions = [{} for _ in range(len(envs))]
+                for i in range(len(envs)):
+                    for k in envs[0].action_space.spaces.keys():
+                        actions[i][k] = data[k][i]
+                remote.send([step_env(env, action) for env, action in zip(envs, actions)])
             elif cmd == "reset":
                 remote.send([env.reset() for env in envs])
             elif cmd == "render":
@@ -324,8 +328,11 @@ class SubprocVecEnv(VecEnv):
 
     def step_async(self, actions):
         self._assert_not_closed()
-        actions = np.array_split(actions, self.nremotes)
-        for remote, action in zip(self.remotes, actions):
+        actions_list = [{} for _ in range(self.nremotes)]
+        for k in self.action_space.spaces.keys():
+            for i, arr in enumerate(np.array_split(actions[k], self.nremotes)):
+                actions_list[i][k] = arr
+        for remote, action in zip(self.remotes, actions_list):
             remote.send(("step", action))
         self.waiting = True
 

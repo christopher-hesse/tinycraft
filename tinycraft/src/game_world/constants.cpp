@@ -11,13 +11,9 @@ const i32 KEY_MOVE_LEFT = (1 << 2);
 const i32 KEY_MOVE_RIGHT = (1 << 3);
 const i32 KEY_MOVE_UP = (1 << 4);
 const i32 KEY_MOVE_DOWN = (1 << 5);
-const i32 KEY_TURN_LEFT = (1 << 6);
-const i32 KEY_TURN_RIGHT = (1 << 7);
-const i32 KEY_TURN_UP = (1 << 8);
-const i32 KEY_TURN_DOWN = (1 << 9);
-const i32 KEY_ATTACK = (1 << 10);
-const i32 KEY_USE = (1 << 11);
-const i32 KEY_SPRINT = (1 << 12);
+const i32 KEY_ATTACK = (1 << 6);
+const i32 KEY_USE = (1 << 7);
+const i32 KEY_SPRINT = (1 << 8);
 
 // reference location is origin, facing along negative z axis (north)
 const int CHUNK_VOXELS_X = 16;

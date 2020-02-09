@@ -57,10 +57,12 @@ class Scalarize:
 
     def step(self, action):
         assert not self._waiting_for_reset
-        if isinstance(self.action_space, gym.spaces.Discrete):
-            action = np.array([action], dtype=self._venv.action_space.dtype)
-        else:
-            action = np.expand_dims(action, axis=0)
+        action = action.copy()
+        for k in self.action_space.spaces.keys():
+            if isinstance(self.action_space.spaces[k], gym.spaces.Discrete):
+                action[k] = np.array([action[k]], dtype=self._venv.action_space.spaces[k].dtype)
+            else:
+                action[k] = np.expand_dims(action[k], axis=0)
         obs, rews, dones, infos = self._venv.step(action)
         if dones[0]:
             self._waiting_for_reset = True

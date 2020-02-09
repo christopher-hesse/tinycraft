@@ -56,21 +56,19 @@ class Interactive(interactive_base.Interactive):
                     return 0
                 else:
                     return None
-            return act
+            return {"delta_yaw": 0.0, "delta_pitch": 0.0, "keys": act}
         elif self.game == "world":
+            delta_yaw = 0.0
+            delta_pitch = 0.0
             KEY_MOVE_FORWARD = 1 << 0
             KEY_MOVE_BACK = 1 << 1
             KEY_MOVE_LEFT = 1 << 2
             KEY_MOVE_RIGHT = 1 << 3
             KEY_MOVE_UP = 1 << 4
             KEY_MOVE_DOWN = 1 << 5
-            KEY_TURN_LEFT = 1 << 6
-            KEY_TURN_RIGHT = 1 << 7
-            KEY_TURN_UP = 1 << 8
-            KEY_TURN_DOWN = 1 << 9
-            KEY_ATTACK = 1 << 10
-            KEY_USE = 1 << 11
-            KEY_SPRINT = 1 << 12
+            KEY_ATTACK = 1 << 6
+            KEY_USE = 1 << 7
+            KEY_SPRINT = 1 << 8
             act = 0
             if "W" in keys:
                 act |= KEY_MOVE_FORWARD
@@ -85,13 +83,13 @@ class Interactive(interactive_base.Interactive):
             if "SPACE" in keys:
                 act |= KEY_MOVE_UP
             if "LEFT" in keys:
-                act |= KEY_TURN_LEFT
+                delta_yaw += 0.3
             if "RIGHT" in keys:
-                act |= KEY_TURN_RIGHT
+                delta_yaw -= 0.3
             if "UP" in keys:
-                act |= KEY_TURN_UP
+                delta_pitch += 0.3
             if "DOWN" in keys:
-                act |= KEY_TURN_DOWN
+                delta_pitch -= 0.3
             if "F" in keys:
                 act |= KEY_ATTACK
             if "G" in keys:
@@ -100,7 +98,7 @@ class Interactive(interactive_base.Interactive):
                 act |= KEY_SPRINT
             if self.sync and act is 0:
                 return None
-            return act
+            return {"delta_yaw": delta_yaw, "delta_pitch": delta_pitch, "keys": act}
         else:
             raise Exception(f"invalid name {self.game}")
 

@@ -48,7 +48,7 @@ struct GameWorld : public Game {
     ~GameWorld();
     void init(bool for_agent) override;
     void reset() override;
-    void act(i32 action, f32 *rew, u8 *done) override;
+    void act(Action action, f32 *rew, u8 *done) override;
     void draw() override;
 
   private:
@@ -567,7 +567,7 @@ void GameWorld::reset() {
     steps_since_block_change = 0;
 }
 
-void GameWorld::act(i32 a, f32 *rew, u8 *done) {
+void GameWorld::act(Action a, f32 *rew, u8 *done) {
     if (debug_enabled) {
         canvas_reset(canvas);
     }
@@ -771,19 +771,8 @@ void GameWorld::act(i32 a, f32 *rew, u8 *done) {
     if (debug_enabled) {
         canvas_print(canvas, "on_ground: %d\n", on_ground);
     }
-
-    if (key_pressed(a, KEY_TURN_LEFT)) {
-        yaw_radians += 0.03f;
-    }
-    if (key_pressed(a, KEY_TURN_RIGHT)) {
-        yaw_radians -= 0.03f;
-    }
-    if (key_pressed(a, KEY_TURN_UP)) {
-        pitch_radians += 0.03f;
-    }
-    if (key_pressed(a, KEY_TURN_DOWN)) {
-        pitch_radians -= 0.03f;
-    }
+        yaw_radians +=a.delta_yaw;
+        pitch_radians += a.delta_pitch;
     if (yaw_radians > PI) {
         yaw_radians -= 2 * PI;
     } else if (yaw_radians < -PI) {

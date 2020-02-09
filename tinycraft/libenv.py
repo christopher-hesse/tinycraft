@@ -13,7 +13,6 @@ import gym.spaces
 from cffi import FFI
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ACTION_KEY = "action"
 STATE_NEEDS_RESET = "needs_reset"
 STATE_WAIT_ACT = "wait_act"
 STATE_WAIT_WAIT = "step_wait"
@@ -116,7 +115,7 @@ class CVecEnv:
         self.spec = None
         self.num_envs = num_envs
         self.observation_space = self._get_spaces(self._c_lib.LIBENV_SPACES_OBSERVATION)
-        self._action_space = self._get_spaces(self._c_lib.LIBENV_SPACES_ACTION)
+        self.action_space = self._get_spaces(self._c_lib.LIBENV_SPACES_ACTION)
         self._info_space = self._get_spaces(self._c_lib.LIBENV_SPACES_INFO)
         self._render_space = self._get_spaces(self._c_lib.LIBENV_SPACES_RENDER)
 
@@ -125,15 +124,9 @@ class CVecEnv:
             self.num_envs, self.observation_space
         )
 
-        # we only use dict spaces for consistency, but action is always a single space
-        # the private version is the dict space, while the public version is a single space
-        assert len(self._action_space.spaces) == 1, "action space can only be 1 element"
-        assert list(self._action_space.spaces.keys())[0] == ACTION_KEY
-        self.action_space = self._action_space.spaces[ACTION_KEY]
-        dict_actions, self._action_buffers = self._allocate_dict_space(
-            self.num_envs, self._action_space
+        self.actions, self._action_buffers = self._allocate_dict_space(
+            self.num_envs, self.action_space
         )
-        self._actions = dict_actions[ACTION_KEY]
 
         self._renders, self._renders_buffers = self._allocate_dict_space(
             self.num_envs, self._render_space
@@ -394,9 +387,10 @@ class CVecEnv:
         self._state = STATE_WAIT_WAIT
 
         if self._debug:
-            self._check_arrays({"action": actions}, self.num_envs, self._action_space)
+            self._check_arrays(actions, self.num_envs, self.action_space)
 
-        self._actions[:] = actions
+        for k in self.actions.keys():
+            self.actions[k][:] = actions[k]
         self._c_lib.libenv_step_async(self._c_env, self._action_buffers, self._c_step)
 
     def step_wait(

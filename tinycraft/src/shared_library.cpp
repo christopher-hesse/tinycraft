@@ -156,10 +156,13 @@ void game_worker(Env *e, EnvGame *eg) {
             eg->should_reset = false;
             eg->game->reset();
         } else {
-            auto act = *(i32 *)(eg->act[0]);
+            Action act = {};
             if (eg->discard_acts > 0) {
-                act = 0;
                 eg->discard_acts--;
+            } else {
+                act.delta_yaw = clamp(*(f32 *)(eg->act[0]), -1.0f, 1.0f) * 0.1f;
+                act.delta_pitch = clamp(*(f32 *)(eg->act[1]), -1.0f, 1.0f) * 0.1f;
+                act.keys = *(i32 *)(eg->act[2]);
             }
             for (int i = 0; i < e->num_action_repeats; i++) {
                 eg->game->act(act, &eg->rew_buffer[eg->write_offset], &eg->done_buffer[eg->write_offset]);
@@ -229,7 +232,7 @@ libenv_venv *libenv_make(int num_envs, const struct libenv_options options) {
     env->num_envs = num_envs;
     env->env_games.resize(num_envs);
 
-    i32 num_actions = 1024;
+    i32 num_actions = 512;
 
     std::mt19937 seed_gen;
     if (seed == -1) {
@@ -317,7 +320,31 @@ libenv_venv *libenv_make(int num_envs, const struct libenv_options options) {
 
     {
         struct libenv_space s;
-        strcpy(s.name, "action");
+        strcpy(s.name, "delta_yaw");
+        s.shape[0] = 1;
+        s.ndim = 1;
+        s.type = LIBENV_SPACE_TYPE_BOX;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.low.float32 = -1.0f;
+        s.high.float32 = 1.0f;
+        env->action_spaces.push_back(s);
+    }
+
+    {
+        struct libenv_space s;
+        strcpy(s.name, "delta_pitch");
+        s.shape[0] = 1;
+        s.ndim = 1;
+        s.type = LIBENV_SPACE_TYPE_BOX;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.low.float32 = -1.0f;
+        s.high.float32 = 1.0f;
+        env->action_spaces.push_back(s);
+    }
+
+    {
+        struct libenv_space s;
+        strcpy(s.name, "keys");
         s.shape[0] = 1;
         s.ndim = 1;
         s.type = LIBENV_SPACE_TYPE_DISCRETE;
