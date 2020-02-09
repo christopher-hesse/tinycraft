@@ -255,7 +255,7 @@ libenv_venv *libenv_make(int num_envs, const struct libenv_options options) {
             i32 world_chunks = 8;
             vo.consume_int("world_chunks", &world_chunks);
             vo.ensure_empty();
-            g = new GameWorld(0, vision_width, vision_height, world_chunks, false);
+            g = new GameWorld(seed_gen(), vision_width, vision_height, world_chunks, false);
         } else if (game == "cube") {
             vo.ensure_empty();
             g = new GameCube(seed_gen(), vision_width, vision_height);
