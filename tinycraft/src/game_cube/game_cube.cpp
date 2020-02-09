@@ -10,7 +10,7 @@ struct GameCube : public Game {
     GameCube(u32 seed, i32 _vision_width, i32 _vision_height);
     void init(bool for_agent) override;
     void reset() override;
-    void act(Action action, f32 *rew, u8 *done) override;
+    Observation act(Action action, f32 *rew, u8 *done) override;
     void draw() override;
 
   private:
@@ -264,7 +264,7 @@ void GameCube::reset() {
     this->yaw_radians = 0;
 }
 
-void GameCube::act(Action a, f32 *rew, u8 *done) {
+Observation GameCube::act(Action a, f32 *rew, u8 *done) {
     if (key_pressed(a, KEY_LEFT)) {
         this->yaw_radians -= 0.1f;
     }
@@ -293,6 +293,8 @@ void GameCube::act(Action a, f32 *rew, u8 *done) {
     if (*done) {
         reset();
     }
+    Observation obs = {};
+    return obs;
 }
 
 void GameCube::draw() {

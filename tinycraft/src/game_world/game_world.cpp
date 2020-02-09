@@ -48,7 +48,7 @@ struct GameWorld : public Game {
     ~GameWorld();
     void init(bool for_agent) override;
     void reset() override;
-    void act(Action action, f32 *rew, u8 *done) override;
+    Observation act(Action action, f32 *rew, u8 *done) override;
     void draw() override;
 
   private:
@@ -584,7 +584,7 @@ void GameWorld::reset() {
     steps_since_block_change = 0;
 }
 
-void GameWorld::act(Action a, f32 *rew, u8 *done) {
+Observation GameWorld::act(Action a, f32 *rew, u8 *done) {
     if (debug_enabled) {
         canvas_reset(canvas);
     }
@@ -828,6 +828,10 @@ void GameWorld::act(Action a, f32 *rew, u8 *done) {
         }
         canvas_print(canvas, "pitch: %f yaw: %f\n", pitch_radians, yaw_radians);
     }
+
+    Observation obs = {};
+    obs.compass_heading = compass_heading;
+    return obs;
 }
 
 std::vector<Chunk *> GameWorld::find_nearby_chunks(int cx, int cz, int radius) {

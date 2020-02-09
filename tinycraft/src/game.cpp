@@ -21,6 +21,10 @@ typedef struct {
     i32 keys;
 } Action;
 
+typedef struct {
+    f32 compass_heading;
+} Observation;
+
 bool key_pressed(Action act, i32 key) {
     return (act.keys & key) == key;
 }
@@ -30,6 +34,6 @@ class Game {
     virtual ~Game(){};
     virtual void init(bool for_agent) = 0;
     virtual void reset() = 0;
-    virtual void act(Action action, f32 *rew, u8 *done) = 0;
+    virtual Observation act(Action action, f32 *rew, u8 *done) = 0;
     virtual void draw() = 0;
 };

@@ -84,6 +84,7 @@ struct EnvGame {
     std::vector<GLuint> pbo_buffer;
     std::vector<f32> rew_buffer;
     std::vector<u8> done_buffer;
+    std::vector<Observation> obs_buffer;
 
     std::vector<void *> ob;
     std::vector<void *> act;
@@ -165,7 +166,8 @@ void game_worker(Env *e, EnvGame *eg) {
                 act.keys = *(i32 *)(eg->act[2]);
             }
             for (int i = 0; i < e->num_action_repeats; i++) {
-                eg->game->act(act, &eg->rew_buffer[eg->write_offset], &eg->done_buffer[eg->write_offset]);
+                Observation obs = eg->game->act(act, &eg->rew_buffer[eg->write_offset], &eg->done_buffer[eg->write_offset]);
+                eg->obs_buffer[eg->write_offset] = obs;
                 if (eg->done_buffer[eg->write_offset]) {
                     // don't repeat actions across episode boundaries
                     break;
@@ -196,6 +198,8 @@ void game_worker(Env *e, EnvGame *eg) {
             }
         }
         finish_pixel_read(e, eg->ob[0], eg->pbo_buffer[eg->read_offset]);
+        auto obs = eg->obs_buffer[eg->read_offset];
+        *(f32 *)(eg->ob[1]) = obs.compass_heading;
         *eg->rew = eg->rew_buffer[eg->read_offset];
         *eg->done = eg->done_buffer[eg->read_offset];
 
@@ -271,6 +275,7 @@ libenv_venv *libenv_make(int num_envs, const struct libenv_options options) {
         eg->pbo_buffer.resize(num_buffered_steps);
         eg->rew_buffer.resize(num_buffered_steps);
         eg->done_buffer.resize(num_buffered_steps);
+        eg->obs_buffer.resize(num_buffered_steps);
         // setup framebuffer and pixel buffer objects
         {
             glCheck(glGenFramebuffers(1, &eg->fbo));
@@ -315,6 +320,18 @@ libenv_venv *libenv_make(int num_envs, const struct libenv_options options) {
         s.dtype = LIBENV_DTYPE_UINT8;
         s.low.uint8 = 0;
         s.high.uint8 = 255;
+        env->observation_spaces.push_back(s);
+    }
+
+    {
+        struct libenv_space s;
+        strcpy(s.name, "compass_heading");
+        s.shape[0] = 1;
+        s.ndim = 1;
+        s.type = LIBENV_SPACE_TYPE_BOX;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.low.uint8 = -1.0f;
+        s.high.uint8 = 1.0f;
         env->observation_spaces.push_back(s);
     }
 
