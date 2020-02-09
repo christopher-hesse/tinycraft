@@ -419,7 +419,7 @@ u8 block_type_and_direction_to_texture[BlockType_Count][Direction_Count] = {
     // BlockType_Ice = 79
     {30, 30, 30, 30, 30, 30},
     // BlockType_Snow = 80
-    {30, 30, 30, 30, 30, 30},
+    {66, 66, 66, 66, 66, 66},
     // BlockType_Cactus = 81
     {30, 30, 30, 30, 30, 30},
     // BlockType_Clay = 82

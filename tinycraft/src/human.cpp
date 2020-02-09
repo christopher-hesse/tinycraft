@@ -47,16 +47,16 @@ Action get_act_world(GLFWwindow *window, f64 delta_xpos, f64 delta_ypos) {
         act.keys |= KEY_MOVE_UP;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        act.delta_yaw += 0.5f;
+        act.delta_yaw += 0.03f;
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        act.delta_yaw -= 0.5f;
+        act.delta_yaw -= 0.03f;
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        act.delta_pitch += 0.5f;
+        act.delta_pitch += 0.03f;
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        act.delta_pitch -= 0.5f;
+        act.delta_pitch -= 0.03f;
     }
     act.delta_yaw -= f32(delta_xpos / 1000.0);
     act.delta_pitch -= f32(delta_ypos / 1000.0);

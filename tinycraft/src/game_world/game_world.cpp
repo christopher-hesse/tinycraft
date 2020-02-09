@@ -70,6 +70,8 @@ struct GameWorld : public Game {
     vec3 player_pos = vec3(0.0f);
     vec3 player_vel = vec3(0.0f);
     ivec3 player_pos_vs = ivec3(0);
+    vec3 goal_pos = vec3(0);
+    f32 prev_goal_closeness = 0.0f;
     f32 yaw_radians = 0.0f;
     f32 pitch_radians = 0.0f;
     bool targeting_block = false;
@@ -112,6 +114,10 @@ struct GameWorld : public Game {
 
 ivec3 world_to_voxelspace(vec3 world) {
     return ivec3(round(world.x), round(world.y), round(world.z));
+}
+
+vec3 voxel_to_worldspace(ivec3 vs) {
+    return vec3(vs);
 }
 
 BoundingBox bounding_box_for_voxel(ivec3 block_pos) {
@@ -560,6 +566,17 @@ void GameWorld::reset() {
 
     num_steps = 0;
     player_pos = world->player_start_pos;
+    goal_pos = vec3(0);
+    u32 goal_x = rand_u32(rand_gen, 0, world->size.x);
+    u32 goal_z = rand_u32(rand_gen, 0, world->size.z);
+    for (int y = world->size.y - 1; y >= 0; y--) {
+        if (world->block_types.get(ivec3(goal_x, y, goal_z)) != BlockType_Air) {
+            goal_pos = vec3(goal_x, y+1, goal_z);
+            break;
+        }
+    }
+    set_voxel(world_to_voxelspace(goal_pos), BlockType_Snow);
+    prev_goal_closeness = calculated_closeness(world->player_start_pos, goal_pos, player_pos);
     pitch_radians = 0.0f;
     yaw_radians = 0.0f;
     on_ground = false;
@@ -578,6 +595,8 @@ void GameWorld::act(Action a, f32 *rew, u8 *done) {
 
     vec3 player_facing = vec3(player_direction * vec4(0.0f, 0.0f, -1.0f, 0.0f));
     player_pos_vs = world_to_voxelspace(player_pos);
+    vec3 goal_direction = normalize(goal_pos - player_pos);
+    f32 compass_heading = dot(goal_direction, player_facing);
 
     // draw a line between the player and where the player is looking
     // search along that line for the voxel that the player is looking at
@@ -780,8 +799,11 @@ void GameWorld::act(Action a, f32 *rew, u8 *done) {
     }
     pitch_radians = clamp(pitch_radians, -PI / 2, PI / 2);
     num_steps++;
-    *rew = 0.0f;
-    *done = num_steps >= WORLD_EPISODE_STEPS;
+    f32 goal_closeness = calculated_closeness(world->player_start_pos, goal_pos, player_pos);
+    *rew = goal_closeness - prev_goal_closeness;
+    prev_goal_closeness = goal_closeness;
+    f32 goal_distance = magnitude(goal_pos - player_pos);
+    *done = num_steps >= WORLD_EPISODE_STEPS || goal_distance < 2.0f;
     if (*done) {
         reset();
     }
@@ -789,6 +811,9 @@ void GameWorld::act(Action a, f32 *rew, u8 *done) {
     if (debug_enabled) {
         canvas_print(canvas, "xyz: %s\n", to_string(player_pos).c_str());
         canvas_print(canvas, "vel: %s\n", to_string(player_vel).c_str());
+        canvas_print(canvas, "goal_direction: %s\n", to_string(goal_direction).c_str());
+        canvas_print(canvas, "goal_distance: %f\n", goal_distance);
+        canvas_print(canvas, "compass_heading: %f\n", compass_heading);
         canvas_print(canvas, "block: %s\n", to_string(player_pos_vs).c_str());
         auto player_chunk_key = get_chunk_key_for_voxel(world, player_pos_vs);
         auto chunk = world->chunk_key_to_chunk.at(player_chunk_key);

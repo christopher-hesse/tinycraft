@@ -11,6 +11,10 @@ f32 magnitude(vec3 v) {
     return sqrt(dot(v, v));
 }
 
+    f32 calculated_closeness(vec3 start, vec3 end, vec3 current) {
+        return 1.0f - magnitude(current - end) / magnitude(start - end);
+    }
+
 bool box_contains(ivec3 pos, ivec3 lower, ivec3 upper) {
     return lower.x <= pos.x && pos.x < upper.x && lower.y <= pos.y && pos.y < upper.y && lower.z <= pos.z && pos.z < upper.z;
 }
